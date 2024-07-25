@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:erp_visualizer/pages/home_page.dart';
 import 'package:erp_visualizer/pages/startup%20menu/complete_process.dart';
@@ -102,96 +101,18 @@ class _ERPVisualizerAppState extends State<ERPVisualizerApp> {
     });
   }
 
-  // Future<void> loginFunction() async {
-  //   try {
-  //     final AuthorizationTokenResponse? result =
-  //     await visualizerAuth.authorizeAndExchangeCode(
-  //       AuthorizationTokenRequest(
-  //         Config.clientId,
-  //         Config.redirectUrl,
-  //         discoveryUrl: Config.discoveryUrl,
-  //         promptValues: ['login'],
-  //         scopes: ['openid'],
-  //       ),
-  //     );
-  //
-  //
-  //     setState(() {
-  //       print('print token results -> refresh token ${result?.refreshToken}');
-  //       _isUserLoggedIn = true;
-  //       _idToken = result?.idToken;
-  //       _accessToken = result?.accessToken;
-  //       _refreshToken = result?.refreshToken;
-  //       _pageIndex = 2;
-  //       var token = _accessToken!.split('.');
-  //       var payload = json.decode(ascii.decode(base64.decode(base64.normalize(token[1]))));  //decode the token
-  //       // print(payload['preferred_username']);
-  //       UserData.userId = payload['preferred_username'].toString().toUpperCase();
-  //       Config.AccessToken = _accessToken!;
-  //
-  //     });
-  //   } catch (e, s) {
-  //     print('Error while login to the system: $e - stack: $s');
-  //     setState(() {
-  //       _isUserLoggedIn = false;
-  //     });
-  //   }
-  // }
-
-  Future<void> _exchangeCode() async {
-    try {
-      print('inside code exchange try');
-
-      final AuthorizationResponse? resultCodes = await visualizerAuth.authorize(
-        AuthorizationRequest(Config.clientId, Config.redirectUrl,
-            discoveryUrl: Config.discoveryUrl, scopes: ['openid'], loginHint: 'login'),
-      );
-
-      print('result Codes : $resultCodes');
-      print('code exchange: ${resultCodes?.codeVerifier}');
-
-      final Random random = Random.secure();
-      final String _nonce =
-      base64Url.encode(List<int>.generate(16, (_) => random.nextInt(256)));
-      print('nonce : $_nonce');
-      final TokenResponse? result = await visualizerAuth.token(TokenRequest(
-          Config.clientId, Config.redirectUrl,
-          authorizationCode: resultCodes?.authorizationCode,
-          discoveryUrl: Config.discoveryUrl,
-          codeVerifier: resultCodes?.codeVerifier,
-          nonce: resultCodes?.nonce,
-          scopes: ['openid']));
-      print("access token : ${result?.accessToken})");
-    } catch (_) {
-      print('inside code exchange catch');
-    }
-  }
-
   Future<void> loginFunction() async {
-    print('login function');
     try {
-      print('inside code exchange try');
-
-      final AuthorizationResponse? resultCodes = await visualizerAuth.authorize(
-        AuthorizationRequest(Config.clientId, Config.redirectUrl,
-            discoveryUrl: Config.discoveryUrl, scopes: ['openid'], loginHint: 'login'),
-      );
-
-      print('result Codes : $resultCodes');
-      print('code exchange: ${resultCodes?.codeVerifier}');
-
-      final Random random = Random.secure();
-      final String _nonce =
-      base64Url.encode(List<int>.generate(16, (_) => random.nextInt(256)));
-      print('nonce : $_nonce');
-      final TokenResponse? result = await visualizerAuth.token(TokenRequest(
-          Config.clientId, Config.redirectUrl,
-          authorizationCode: resultCodes?.authorizationCode,
+      final AuthorizationTokenResponse? result =
+      await visualizerAuth.authorizeAndExchangeCode(
+        AuthorizationTokenRequest(
+          Config.clientId,
+          Config.redirectUrl,
           discoveryUrl: Config.discoveryUrl,
-          codeVerifier: resultCodes?.codeVerifier,
-          nonce: resultCodes?.nonce,
-          scopes: ['openid']));
-      print("access token : ${result?.accessToken})");
+          promptValues: ['login'],
+          scopes: ['openid'],
+        ),
+      );
 
 
       setState(() {
@@ -319,13 +240,12 @@ class LogInPage extends StatelessWidget {
                 fixedSize: MaterialStatePropertyAll(Size(250, 40)),
               ),
               onPressed: () {
-                // loginFunction().then((_) {
-                //   if (_isUserLoggedIn == true) {
-                //     // Navigate to home page after login successful
-                //     Navigator.pushNamed(context, '/home');
-                //   }
-                // });
-                loginFunction();
+                loginFunction().then((_) {
+                  if (_isUserLoggedIn == true) {
+                    // Navigate to home page after login successful
+                    Navigator.pushNamed(context, '/home');
+                  }
+                });
               },
               child: Text('Sign In', textScaler: TextScaler.linear(1.4)),
             ),
